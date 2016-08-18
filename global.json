@@ -1,0 +1,8 @@
+{
+    "projects":[
+        "eggsolve.contracts",
+        "eggsolve.host",
+        "eggsolve.service",
+        "eggsolve.solver"
+    ]
+}
