@@ -30,7 +30,7 @@ namespace eggsolve.host
                     if (!x.ContainsKey(distKey)) { return null; }
                     var distance = (int)x[distKey];
                     var eggVals = new List<int>();
-                    for (int j = 0; j < 10; j++)
+                    for (int j = 0; j < i; j++)
                     {
                         if (x.ContainsKey(string.Format(eggKeyBase, j)))
                         {
@@ -58,8 +58,7 @@ namespace eggsolve.host
 
         private SolvingResult GetResults(Distance distance, List<Distance> eggs)
         {
-            EggSolver solv = new EggSolver();
-            return solv.Solve(distance, eggs.Select(x => new Egg(x)).ToList());
+            return EggSolver.Solve(distance, eggs.Select(x => new Egg(x)).ToList());
         }
     }
 }
