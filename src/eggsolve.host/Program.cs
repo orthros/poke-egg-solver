@@ -2,7 +2,6 @@
 using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using eggsolve.service;
 
 namespace eggsolve.host
 {
@@ -17,7 +16,7 @@ namespace eggsolve.host
                 .UseStartup<Startup>()
                 .Build();
 
-            host.Run();            
+            host.Run();
         }
     }
 }
