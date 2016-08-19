@@ -8,9 +8,16 @@ namespace eggsolve.solver
     {
         public static SolvingResult Solve(Distance walkingDistance, List<Egg> eggs)
         {
-            var maxDistance = eggs.Where(x => x.EggDistance <= walkingDistance)
-                                  .Select(x => x.EggDistance)
-                                  .Max();
+            var eggsAtMaxDistance = eggs.Where(x => x.EggDistance <= walkingDistance);
+            if(!eggsAtMaxDistance.Any())
+            {
+                return new SolvingResult(new List<Distance>(),
+                                         new List<List<Distance>>(),
+                                         eggs.Select(x=> x.EggDistance).ToList());
+            }
+
+            var maxDistance = eggsAtMaxDistance.Select(x => x.EggDistance)
+                                               .Max();
 
             Console.WriteLine(string.Format("The longest egg walk is: {0}", maxDistance));
 
@@ -43,7 +50,7 @@ namespace eggsolve.solver
                          if (bestToUse == null)
                          {
                              if(currentIncubatorSet.Any())
-                             {                                 
+                             {
                                  bestToUse = currentIncubatorSet.MinBy(y=> y.TotalDistance);
                              }
                          }
