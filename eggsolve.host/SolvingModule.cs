@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,47 +12,49 @@ namespace eggsolve.host
         public SolvingModule()
         {
             var availableDistances = new HashSet<int>() { 2, 5, 10 };
-            Func<int, List<int>, bool> isValidSet = new Func<int,List<int>, bool>((distance, eggs) =>
+            Func<int, List<int>, bool> isValidSet = new Func<int, List<int>, bool>((distance, eggs) =>
+             {
+                 if (!availableDistances.Contains(distance) || !availableDistances.IsSupersetOf(eggs))
+                 {
+                     return false;
+                 }
+                 return true;
+             });
+
+            var distKey = "distance";
+            var eggKeyBase = "egg{0}";
+            for (int i = 1; i < 10; i++)
             {
-                if(!availableDistances.Contains(distance) || !availableDistances.IsSupersetOf(eggs))
+                var func = new Func<dynamic, object>(x =>
                 {
-                    return false;
-                }
-                return true;
-            });
+                    if (!x.ContainsKey(distKey)) { return null; }
+                    var distance = (int)x[distKey];
+                    var eggVals = new List<int>();
+                    for (int j = 0; j < 10; j++)
+                    {
+                        if (x.ContainsKey(string.Format(eggKeyBase, j)))
+                        {
+                            eggVals.Add((int)x[string.Format(eggKeyBase, j)]);
+                        }
+                    }
 
-            Get("/solve/{distance:int}/{egg1:int}", parameters => {
-                    var distInt = (int)parameters.distance;
-                    var egg1Int = (int)parameters.egg1;
-
-                    List<int> eggs = new List<int>(){ egg1Int };
-                    if(!isValidSet(distInt,eggs))
+                    if (!isValidSet(distance, eggVals))
                     {
                         return null;
                     }
 
-                    return GetResults((Distance)distInt, eggs.Cast<Distance>().ToList());
+                    return GetResults((Distance)distance, eggVals.Cast<Distance>().ToList());
                 });
 
-            Get("/solve/{distance:int}/{egg1:int}/{egg2:int}", parameters => {
-                    var distInt = (int)parameters.distance;
-                    var egg1Int = (int)parameters.egg1;
-                    var egg2Int = (int)parameters.egg2;
+                string getString = string.Format("/solve/distance/{0}/eggs/{1}",
+                                                 string.Concat("{", distKey, ":int}"),
+                                                 string.Join("/", Enumerable.Range(0, i).Select(x => string.Concat("{", string.Format(eggKeyBase, x), ":int}"))));
 
-                    var eggTmp = (int)parameters["egg2"];
+                //Console.WriteLine(getString);
 
-                    List<int> eggs = new List<int>(){ egg1Int, egg2Int };
-                    if(!isValidSet(distInt,eggs))
-                    {
-                        return null;
-                    }
-
-                    return GetResults((Distance)distInt, eggs.Cast<Distance>().ToList());
-                });
-
+                Get(getString, func);
+            }
         }
-
-
 
         private SolvingResult GetResults(Distance distance, List<Distance> eggs)
         {
